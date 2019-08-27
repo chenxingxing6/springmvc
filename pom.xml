@@ -6,7 +6,12 @@
 
     <groupId>org.springframework</groupId>
     <artifactId>springmvc</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>springmvc-core</module>
+        <module>springmvc-test</module>
+    </modules>
 
 
 </project>
