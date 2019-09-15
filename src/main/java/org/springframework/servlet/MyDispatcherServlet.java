@@ -226,7 +226,7 @@ public class MyDispatcherServlet extends HttpServlet{
             resp.getWriter().write("404 Not Found");
             return;
         }catch (Exception e){
-            resp.getWriter().write("500 error " + Arrays.toString(e.getStackTrace()));
+            resp.getWriter().write("500 error \r\n\n" + Arrays.toString(e.getStackTrace()));
             return;
         }
     }
