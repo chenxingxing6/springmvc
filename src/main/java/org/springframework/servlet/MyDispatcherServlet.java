@@ -1,6 +1,9 @@
 package org.springframework.servlet;
 
 import org.springframework.annotation.*;
+import org.springframework.core.DefaultHandlerAdapter;
+import org.springframework.core.Handler;
+import org.springframework.core.IHandlerAdapter;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -33,16 +36,18 @@ public class MyDispatcherServlet extends HttpServlet{
     // 实例化对象
     Map<String, Object> ioc = null;
 
-    // 改造
+    // Handler
     List<Handler> handlers;
 
-    private static final String HANDLER_ADAPTER_PACKAGE = "org.org.springframework.handleradapter";
+    // 默认适配器
+    IHandlerAdapter defaultHandlerAdapter = null;
 
     public MyDispatcherServlet(){
         props = new Properties();
         classNames = new ArrayList<>();
         ioc = new ConcurrentHashMap<>();
         handlers = new ArrayList<>();
+        defaultHandlerAdapter = new DefaultHandlerAdapter();
     }
 
     // 初始化
@@ -203,12 +208,6 @@ public class MyDispatcherServlet extends HttpServlet{
         }
     }
 
-    private static String lowerFirstCase(String old){
-        char [] chars = old.toCharArray();
-        chars[0] += 32;
-        return String.valueOf(chars);
-    }
-
     // 6.运行阶段，等待请求
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -233,132 +232,22 @@ public class MyDispatcherServlet extends HttpServlet{
     }
 
     private void doDispatch(HttpServletRequest req, HttpServletResponse resp) throws Exception{
-        Handler handler = getHandler(req);
-        if (handler == null){
-            resp.getWriter().write("404 Not Found!");
-            return;
-        }
-
-        Method method = handler.method;
-        // 获取方法参数列表
-        Class<?>[] parameterTypes = handler.method.getParameterTypes();
-        Object[] paramValues = new Object[parameterTypes.length];
-
-        Map<String, String[]> paramsMap = req.getParameterMap();
-        // 方法参数列表
-
-        for (Map.Entry<String, String[]> param : paramsMap.entrySet()) {
-            String value = parseParamValue(param.getValue());
-            if (!handler.paramIndexmapping.containsKey(param.getKey())){
-                continue;
-            }
-            int index = handler.paramIndexmapping.get(param.getKey());
-            paramValues[index] = convert(parameterTypes[index], value);
-        }
-
-        // 设置方法中的request 和 response
-        Integer reqIndex = handler.paramIndexmapping.get(HttpServletRequest.class.getName());
-        if (reqIndex !=null){
-            paramValues[reqIndex] = req;
-        }
-
-        Integer respIndex = handler.paramIndexmapping.get(HttpServletResponse.class.getName());
-        if (respIndex != null){
-            paramValues[respIndex] = resp;
-        }
-
-        try {
-            String beanName = lowerFirstCase(method.getDeclaringClass().getSimpleName());
-            method.invoke(ioc.get(beanName), paramValues);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private String parseParamValue(String[] params){
-        return Arrays.toString(params)
-                .replaceAll("\\[|\\]", "")
-                .replaceAll("\\s", ",");
-    }
-
-    private Object convert(Class clazz, String value){
-        if (clazz == Integer.class){
-            return Integer.valueOf(value);
-        }
-        if (clazz == String.class){
-            return String.valueOf(value);
-        }
-        return value;
+        // 获取适配器
+        IHandlerAdapter handlerAdapter = defaultHandlerAdapter;
+        Object[] paramValues = handlerAdapter.hand(req, resp, handlers);
+        Method method = handlerAdapter.getHandler(req, handlers).method;
+        String beanName = lowerFirstCase(method.getDeclaringClass().getSimpleName());
+        method.invoke(ioc.get(beanName), paramValues);
     }
 
     /**
-     * 获取Handler
-     * @param req
+     * 首字母小写
+     * @param old
      * @return
      */
-    private Handler getHandler(HttpServletRequest req){
-        if (handlers.isEmpty()){
-            return null;
-        }
-        String url = req.getRequestURI();
-        String contextpath= req.getContextPath();
-        url = url.replace(contextpath, "").replaceAll("/+", "/");
-        for (Handler handler : handlers) {
-            try {
-                Matcher matcher = handler.pattern.matcher(url);
-                // 如果没匹配上，继续下个匹配
-                if (!matcher.matches()){
-                    continue;
-                }
-                return handler;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        return null;
+    private static String lowerFirstCase(String old){
+        char [] chars = old.toCharArray();
+        chars[0] += 32;
+        return String.valueOf(chars);
     }
-
-    /**
-     * 记录Controller与Requestmapping和Method对应关系
-     */
-    private class Handler{
-        protected Object controller;
-        protected Method method;
-        protected Pattern pattern;
-        protected Map<String, Integer> paramIndexmapping;
-
-        public Handler(Pattern pattern, Object controller, Method method) {
-            this.pattern = pattern;
-            this.controller = controller;
-            this.method = method;
-            paramIndexmapping = new HashMap<>();
-            putParamIndexMapping(method);
-
-        }
-
-        protected void putParamIndexMapping(Method method){
-            // 提取方法中加了注解的参数
-            Annotation[][] pa = method.getParameterAnnotations();
-            for (int i = 0; i < pa.length; i++) {
-                for (Annotation a : pa[i]) {
-                    if (a instanceof RequestParam){
-                        String paramName = ((RequestParam) a).value();
-                        if (!"".equals(paramName.trim())){
-                            paramIndexmapping.put(paramName, i);
-                        }
-                    }
-                }
-            }
-
-            // 提取方法中的request和response
-            Class<?> [] paramsTypes = method.getParameterTypes();
-            for (int i = 0; i < paramsTypes.length; i++) {
-                Class type = paramsTypes[i];
-                if (type == HttpServletRequest.class || type == HttpServletResponse.class){
-                    paramIndexmapping.put(type.getName(), i);
-                }
-            }
-        }
-    }
-
 }
