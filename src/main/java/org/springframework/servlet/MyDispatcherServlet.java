@@ -222,7 +222,7 @@ public class MyDispatcherServlet extends HttpServlet{
             url = url.replace(contextpath, "").replaceAll("/+", "/");
             System.out.println("进行请求....url：" + url);
         }catch (Exception e){
-            resp.getWriter().write("500 Exception, Details: \r\n\n" + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -230,8 +230,12 @@ public class MyDispatcherServlet extends HttpServlet{
         boolean jsonResult = false;
         // 获取适配器
         IHandlerAdapter handlerAdapter = defaultHandlerAdapter;
-        Object[] paramValues = handlerAdapter.hand(req, resp, handlers);
         Handler handler = handlerAdapter.getHandler(req, handlers);
+        if (handler == null){
+            resp.getOutputStream().print("404 Not Found");
+            return;
+        }
+        Object[] paramValues = handlerAdapter.hand(req, resp, handlers);
         Method method = handler.method;
         Object controller = handler.controller;
         String beanName = lowerFirstCase(method.getDeclaringClass().getSimpleName());

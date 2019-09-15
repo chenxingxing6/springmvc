@@ -19,7 +19,6 @@ public class DefaultHandlerAdapter implements IHandlerAdapter {
     public Object[] hand(HttpServletRequest req, HttpServletResponse resp, List<Handler> handlers) throws Exception{
         Handler handler = getHandler(req, handlers);
         if (handler == null){
-            resp.getWriter().write("404 Not Found!");
             return null;
         }
 
