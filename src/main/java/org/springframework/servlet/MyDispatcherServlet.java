@@ -12,20 +12,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Author: cxx
  * @Date: 2019/8/27 22:45
  */
-public class DispatcherServlet extends HttpServlet{
+public class MyDispatcherServlet extends HttpServlet{
     private List<String> classNames = new ArrayList<>();
     Map<String, Object> beans = new ConcurrentHashMap<>();
     Map<String, Object> handlerMap = new HashMap<>();
     Properties props = null;
-    private static final String HANDLER_ADAPTER_PACKAGE = "org.springframework.handleradapter";
+    private static final String HANDLER_ADAPTER_PACKAGE = "org.org.springframework.handleradapter";
 
-    public DispatcherServlet(){
+    public MyDispatcherServlet(){
 
     }
 
     // 初始化
     @Override
     public void init() throws ServletException {
+        System.out.println("My mvc is init ......");
         // 1.基本包进行扫描，获取包下及子包下所有类
 
         // 2.扫描处理的类进行实例化
