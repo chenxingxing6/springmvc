@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -221,8 +222,12 @@ public class MyDispatcherServlet extends HttpServlet{
             String contextpath= req.getContextPath();
             url = url.replace(contextpath, "").replaceAll("/+", "/");
             System.out.println("进行请求....url：" + url);
+        }catch (FileNotFoundException e){
+            resp.getWriter().write("404 Not Found");
+            return;
         }catch (Exception e){
-            e.printStackTrace();
+            resp.getWriter().write("500 error " + Arrays.toString(e.getStackTrace()));
+            return;
         }
     }
 
@@ -232,8 +237,7 @@ public class MyDispatcherServlet extends HttpServlet{
         IHandlerAdapter handlerAdapter = defaultHandlerAdapter;
         Handler handler = handlerAdapter.getHandler(req, handlers);
         if (handler == null){
-            resp.getOutputStream().print("404 Not Found");
-            return;
+            throw new FileNotFoundException();
         }
         Object[] paramValues = handlerAdapter.hand(req, resp, handlers);
         Method method = handler.method;

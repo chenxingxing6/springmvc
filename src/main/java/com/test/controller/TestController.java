@@ -20,9 +20,10 @@ public class TestController {
 
     @RequestMapping("/view.jsp")
     public MyModeAndView view(HttpServletRequest req){
+        String name = req.getParameter("name");
         MyModeAndView modeAndView = new MyModeAndView();
         modeAndView.setViewName("index");
-        modeAndView.addObject("name", "lanxinghua");
+        modeAndView.addObject("name", name);
         return modeAndView;
     }
 
