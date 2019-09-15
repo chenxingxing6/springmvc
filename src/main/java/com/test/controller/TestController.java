@@ -29,4 +29,14 @@ public class TestController {
             e.printStackTrace();
         }
     }
+
+    @RequestMapping("/add")
+    public void test(HttpServletResponse resp, @RequestParam("a") Integer a, @RequestParam("b") Integer b){
+        String result =  testService.test( "");
+        try {
+            resp.getWriter().print(a + b);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

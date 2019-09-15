@@ -6,7 +6,7 @@
 
     <groupId>org.org.springframework</groupId>
     <artifactId>springmvc</artifactId>
-    <packaging>pom</packaging>
+    <packaging>war</packaging>
     <version>1.0.0-my-SNAPSHOT</version>
 
     <dependencies>
@@ -14,6 +14,12 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dfire.soa.retail</groupId>
+            <artifactId>common-beans</artifactId>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 

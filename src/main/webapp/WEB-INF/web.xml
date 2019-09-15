@@ -7,9 +7,12 @@
     <servlet>
         <servlet-name>DispatcherServlet</servlet-name>
         <display-name>DispatcherServlet</display-name>
-        <description></description>
         <servlet-class>org.springframework.servlet.MyDispatcherServlet</servlet-class>
-        <load-on-startup>0</load-on-startup>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:application.properties</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>DispatcherServlet</servlet-name>
