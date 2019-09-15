@@ -1,10 +1,8 @@
 package com.test.controller;
 
 import com.test.service.ITestService;
-import org.springframework.annotation.Autowired;
-import org.springframework.annotation.Controller;
-import org.springframework.annotation.RequestMapping;
-import org.springframework.annotation.RequestParam;
+import org.springframework.annotation.*;
+import org.springframework.core.MyModeAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,23 +18,53 @@ public class TestController {
     @Autowired
     private ITestService testService;
 
+    @RequestMapping("/view.jsp")
+    public MyModeAndView view(HttpServletRequest req){
+        MyModeAndView modeAndView = new MyModeAndView();
+        modeAndView.setViewName("index");
+        modeAndView.addObject("name", "lanxinghua");
+        return modeAndView;
+    }
+
     @RequestMapping("/get.json")
-    public void test(HttpServletRequest req, HttpServletResponse res, @RequestParam("name") String name){
-        String result =  testService.test(name);
-        try {
-           res.getWriter().print(result);
-        }catch (Exception e){
-            e.printStackTrace();
+    @ResponseBody
+    public String test(@RequestParam("name") String name){
+        return testService.test(name);
+    }
+
+    @RequestMapping("/getUser")
+    @ResponseBody
+    public User getUser(){
+        User user = new User();
+        user.setAge(20);
+        user.setName("superboycxx");
+        return user;
+    }
+
+    class User{
+        private String name;
+        private Integer age;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Integer getAge() {
+            return age;
+        }
+
+        public void setAge(Integer age) {
+            this.age = age;
         }
     }
 
     @RequestMapping("/add")
-    public void test(HttpServletResponse resp, @RequestParam("a") Integer a, @RequestParam("b") Integer b){
-        String result =  testService.test( "");
-        try {
-            resp.getWriter().print(a + b);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    @ResponseBody
+    public String test(HttpServletResponse resp, @RequestParam("a") Integer a, @RequestParam("b") Integer b){
+        return String.valueOf(a + b);
     }
 }

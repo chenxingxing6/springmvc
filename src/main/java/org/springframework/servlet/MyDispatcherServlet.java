@@ -1,9 +1,8 @@
 package org.springframework.servlet;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.annotation.*;
-import org.springframework.core.DefaultHandlerAdapter;
-import org.springframework.core.Handler;
-import org.springframework.core.IHandlerAdapter;
+import org.springframework.core.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -217,27 +216,58 @@ public class MyDispatcherServlet extends HttpServlet{
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            resp.setHeader("Content-type", "text/html;charset=UTF-8");
-            resp.setCharacterEncoding("UTF-8");
-            req.setCharacterEncoding("UTF-8");
             doDispatch(req, resp);
-
             String url = req.getRequestURI();
             String contextpath= req.getContextPath();
             url = url.replace(contextpath, "").replaceAll("/+", "/");
             System.out.println("进行请求....url：" + url);
         }catch (Exception e){
-            resp.getWriter().write("500 Exception, Details:\r\n" + Arrays.toString(e.getStackTrace()));
+            resp.getWriter().write("500 Exception, Details: \r\n\n" + e.getMessage());
         }
     }
 
     private void doDispatch(HttpServletRequest req, HttpServletResponse resp) throws Exception{
+        boolean jsonResult = false;
         // 获取适配器
         IHandlerAdapter handlerAdapter = defaultHandlerAdapter;
         Object[] paramValues = handlerAdapter.hand(req, resp, handlers);
-        Method method = handlerAdapter.getHandler(req, handlers).method;
+        Handler handler = handlerAdapter.getHandler(req, handlers);
+        Method method = handler.method;
+        Object controller = handler.controller;
         String beanName = lowerFirstCase(method.getDeclaringClass().getSimpleName());
-        method.invoke(ioc.get(beanName), paramValues);
+
+        //如果controller或这个方法有UVResponseBody修饰，返回json
+        if (controller.getClass().isAnnotationPresent(ResponseBody.class) || method.isAnnotationPresent(ResponseBody.class)){
+            jsonResult = true;
+        }
+        Object object = method.invoke(ioc.get(beanName), paramValues);
+        if (jsonResult && object !=null){
+            resp.getWriter().write(JSON.toJSONString(object));
+        }else {
+            // 返回视图
+            doResolveView(object, req, resp);
+        }
+    }
+
+    public void doResolveView(Object object, HttpServletRequest req, HttpServletResponse resp) throws Exception{
+        // 视图前缀
+        String prefix = props.getProperty("view.prefix");
+        // 视图后缀
+        String suffix = props.getProperty("view.suffix");
+
+        String indexView = "";
+        MyModeAndView modeAndView = null;
+        if (object instanceof MyModeAndView){
+            modeAndView = (MyModeAndView) object;
+            indexView = modeAndView.getViewName();
+        }else {
+            indexView = object.toString();
+        }
+        String view = (prefix + indexView + suffix).trim().replaceAll("/+", "/");
+        System.out.println("视图解析器 " + view);
+        DefaultViewResolver viewResolver = new DefaultViewResolver();
+        modeAndView.setViewName(view);
+        viewResolver.resolve(modeAndView, req, resp);
     }
 
     /**
