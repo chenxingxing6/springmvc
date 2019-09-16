@@ -23,6 +23,8 @@
 ```
 
 ---
+访问地址：http://localhost:8080/test/view?path=login
+
 ```html
 <html>
 <head>
