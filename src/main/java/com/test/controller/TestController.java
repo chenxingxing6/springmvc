@@ -18,11 +18,12 @@ public class TestController {
     @Autowired
     private ITestService testService;
 
-    @RequestMapping("/view.jsp")
+    @RequestMapping("/view")
     public MyModeAndView view(HttpServletRequest req){
         String name = req.getParameter("name");
+        String path = req.getParameter("path");
         MyModeAndView modeAndView = new MyModeAndView();
-        modeAndView.setViewName("index");
+        modeAndView.setViewName(path);
         modeAndView.addObject("name", name);
         return modeAndView;
     }
@@ -31,6 +32,14 @@ public class TestController {
     @ResponseBody
     public String test(@RequestParam("name") String name){
         return testService.test(name);
+    }
+
+    @RequestMapping("/login")
+    public MyModeAndView login(@RequestParam("name") String name, @RequestParam("pwd") String pwd){
+        MyModeAndView modeAndView = new MyModeAndView();
+        modeAndView.setViewName("index");
+        modeAndView.addObject("name", name);
+        return modeAndView;
     }
 
     @RequestMapping("/getUser")

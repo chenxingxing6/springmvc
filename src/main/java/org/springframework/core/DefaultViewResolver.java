@@ -25,31 +25,43 @@ public class DefaultViewResolver{
     // 是否要缓存模版
     boolean isCached = false;
 
+    private String prefix = "/jsp/";
+
+    private String suffix = ".jsp";
+
+    public DefaultViewResolver(){
+
+    }
+
+    public DefaultViewResolver(String prefix, String suffix){
+        this.prefix = prefix;
+        this.suffix = suffix;
+    }
+
     public void resolve(MyModeAndView modeAndView, HttpServletRequest req, HttpServletResponse resp) throws Exception{
         // 设置响应头
-        resp.setContentType("text/html;charset=utf-8");
+        // resp.setContentType("text/html;charset=utf-8");
         IOUtils.write(getHtml(modeAndView), resp.getOutputStream(), "UTF-8");
     }
 
     private String getHtml(MyModeAndView modeAndView) {
         // 缓存中取
-        String path = modeAndView.getViewName();
-        String s = cache.get(path);
+        String view = (prefix + modeAndView.getViewName() + suffix).trim().replaceAll("/+", "/");
+        String s = cache.get(view);
         if (null == s) {
             try {
-                String basePath = "C:\\Users\\cxx\\Desktop\\springmvc\\src\\main\\webapp\\";
                 // 获取模版文件
-                InputStream is = new FileInputStream(new File(basePath + path.replaceAll("/", "\\\\")));
+                InputStream is = this.getClass().getClassLoader().getResourceAsStream(view);
                 // 读取为字符串
                 s = IOUtils.toString(is, "UTF-8");
             } catch (FileNotFoundException e) {
-                throw new NullPointerException(String.format("视图[%s]不存在", path));
+                throw new NullPointerException(String.format("视图[%s]不存在", view));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             s = fillValue(s, modeAndView.getMap());
             if (isCached) {
-                cache.put(path, s);
+                cache.put(view, s);
             }
         }
         return s;

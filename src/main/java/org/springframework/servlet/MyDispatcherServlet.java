@@ -13,13 +13,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -263,18 +261,13 @@ public class MyDispatcherServlet extends HttpServlet{
         // 视图后缀
         String suffix = props.getProperty("view.suffix");
 
-        String indexView = "";
         MyModeAndView modeAndView = null;
         if (object instanceof MyModeAndView){
             modeAndView = (MyModeAndView) object;
-            indexView = modeAndView.getViewName();
         }else {
-            indexView = object.toString();
+            modeAndView = new MyModeAndView(object.toString());
         }
-        String view = (prefix + indexView + suffix).trim().replaceAll("/+", "/");
-        System.out.println("视图解析器 " + view);
-        DefaultViewResolver viewResolver = new DefaultViewResolver();
-        modeAndView.setViewName(view);
+        DefaultViewResolver viewResolver = new DefaultViewResolver(prefix, suffix);
         viewResolver.resolve(modeAndView, req, resp);
     }
 
