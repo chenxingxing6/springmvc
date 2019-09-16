@@ -1,11 +1,11 @@
 ## 手写SpringMvc
 项目结构
-![avatar](/home/picture/1.png)
+![avatar](https://raw.githubusercontent.com/chenxingxing6/springmvc/master/img/33.jpg)
 
 ---
 ##### 登陆测试Demo
-![avatar](/home/picture/1.png)
-![avatar](/home/picture/1.png)
+![avatar](https://raw.githubusercontent.com/chenxingxing6/springmvc/master/img/11.jpg)
+![avatar](https://raw.githubusercontent.com/chenxingxing6/springmvc/master/img/22.jpg)
 
 ```html
 @RequestMapping("/login")
