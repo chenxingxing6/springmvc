@@ -1,4 +1,36 @@
 ## 手写SpringMvc[尽可能模仿SpringMvc源码]
+
+###### 更新日志 2019.9.21 
+ > 1. 修改前端控制器，模仿spirngmvc源码   
+ > 2. 更加模块化   
+ > 3. 引入ApplicationContext，配置放入上下文中   
+ > 4. 需要看原来以前简单的代码，可以看以前的提交记录  
+ ```html
+public void initStrategies(ApplicationContext context){
+   // 请求解析
+   initMultipartResolver(context);
+   // 多语言、国际化解析
+   initLocaleResolver(context);
+   // 主题View解析
+   initThemeResolver(context);
+   // 解析url和Method的关联关系
+   initHandlerMappings(context);
+   // 适配器（匹配的过程）
+   initHandlerAdapters(context);
+   // 异常解析
+   initHandlerExceptionResolvers(context);
+   // 视图转发（根据视图名字匹配到一个具体模板）
+   initRequestToViewNameTranslator(context);
+   // 解析模板中的内容（拿到服务器传过来的数据，生成HTML代码）
+   initViewResolvers(context);
+   initFlashMapManager(context);
+}
+```
+ 
+
+
+---
+
 ![avatar](https://raw.githubusercontent.com/chenxingxing6/springmvc/master/img/44.jpg)
 
 
