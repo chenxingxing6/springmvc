@@ -28,6 +28,11 @@ public class TestController {
         return modeAndView;
     }
 
+    @RequestMapping("/logintest")
+    public String view(){
+        return "/login";
+    }
+
     @RequestMapping("/get.json")
     @ResponseBody
     public String test(@RequestParam("name") String name){
@@ -74,7 +79,7 @@ public class TestController {
 
     @RequestMapping("/add")
     @ResponseBody
-    public String test(HttpServletResponse resp, @RequestParam("a") Integer a, @RequestParam("b") Integer b){
-        return String.valueOf(a + b);
+    public int test(HttpServletResponse resp, @RequestParam("a") Integer a, @RequestParam("b") Integer b){
+        return a + b;
     }
 }

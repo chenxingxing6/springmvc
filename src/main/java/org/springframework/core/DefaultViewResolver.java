@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +19,7 @@ import java.util.regex.Pattern;
  * @Date: 2019/9/16 0:39
  * 默认视图解析器
  */
-public class DefaultViewResolver{
+public class DefaultViewResolver implements ViewResolver{
     // 用来缓存页面，这样就不用每次都读模版文件，减少IO
     Map<String/*视图路径*/, String> cache = new HashMap<>();
 
@@ -29,24 +30,27 @@ public class DefaultViewResolver{
 
     private String suffix = ".jsp";
 
+    private String filePath;
+
     public DefaultViewResolver(){
 
     }
 
-    public DefaultViewResolver(String prefix, String suffix){
+    public DefaultViewResolver(String prefix, String suffix, String filePath){
         this.prefix = prefix;
         this.suffix = suffix;
+        this.filePath = filePath;
     }
 
-    public void resolve(MyModeAndView modeAndView, HttpServletRequest req, HttpServletResponse resp) throws Exception{
-        // 设置响应头
-        // resp.setContentType("text/html;charset=utf-8");
-        IOUtils.write(getHtml(modeAndView), resp.getOutputStream(), "UTF-8");
+    @Override
+    public View resolve(MyModeAndView modeAndView, Locale locale) throws Exception {
+        return new View(getHtml(modeAndView, locale));
     }
 
-    private String getHtml(MyModeAndView modeAndView) {
+    private String getHtml(MyModeAndView modeAndView, Locale locale) {
+        String viewName = modeAndView.getViewName().startsWith("/") == true ? modeAndView.getViewName() : "/" + modeAndView.getViewName();
         // 缓存中取
-        String view = (prefix + modeAndView.getViewName() + suffix).trim().replaceAll("/+", "/");
+        String view = (prefix + viewName + suffix).trim().replaceAll("/+", "/");
         String s = cache.get(view);
         if (null == s) {
             try {

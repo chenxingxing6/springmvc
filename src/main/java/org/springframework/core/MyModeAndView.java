@@ -11,6 +11,7 @@ import java.util.Map;
 public class MyModeAndView {
     private String viewName;
     private Map<String, Object> map = new HashMap<>();
+    private boolean flag = true;
 
     public MyModeAndView(){
 
@@ -34,5 +35,13 @@ public class MyModeAndView {
 
     public Map<String, Object> getMap() {
         return map;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public boolean isFlag() {
+        return flag;
     }
 }

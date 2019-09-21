@@ -1,5 +1,7 @@
 package org.springframework.core;
 
+import com.alibaba.fastjson.JSON;
+import org.springframework.annotation.ResponseBody;
 import org.springframework.annotation.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,15 +15,9 @@ import java.util.regex.Matcher;
  * @Author: cxx
  * @Date: 2019/9/15 22:56
  */
-@Service
 public class DefaultHandlerAdapter implements IHandlerAdapter {
     @Override
-    public Object[] hand(HttpServletRequest req, HttpServletResponse resp, List<Handler> handlers) throws Exception{
-        Handler handler = getHandler(req, handlers);
-        if (handler == null){
-            return null;
-        }
-
+    public MyModeAndView handler(HttpServletRequest req, HttpServletResponse resp, Handler handler) throws Exception {
         // 获取方法参数列表
         Class<?>[] parameterTypes = handler.method.getParameterTypes();
         Object[] paramValues = new Object[parameterTypes.length];
@@ -47,35 +43,26 @@ public class DefaultHandlerAdapter implements IHandlerAdapter {
         if (respIndex != null){
             paramValues[respIndex] = resp;
         }
-        return paramValues;
-    }
 
-    /**
-     * 获取Handler
-     * @param req
-     * @param handlers
-     * @return
-     */
-    public Handler getHandler(HttpServletRequest req, List<Handler> handlers){
-        if (handlers.isEmpty()){
-            return null;
+        Object result = handler.method.invoke(handler.controller, paramValues);
+        if (result instanceof MyModeAndView){
+            return (MyModeAndView) result;
         }
-        String url = req.getRequestURI();
-        String contextpath= req.getContextPath();
-        url = url.replace(contextpath, "").replaceAll("/+", "/");
-        for (Handler handler : handlers) {
-            try {
-                Matcher matcher = handler.pattern.matcher(url);
-                // 如果没匹配上，继续下个匹配
-                if (!matcher.matches()){
-                    continue;
-                }
-                return handler;
-            }catch (Exception e){
-                e.printStackTrace();
+        //如果controller或这个方法有ResponseBody修饰，返回json
+        if (handler.controller.getClass().isAnnotationPresent(ResponseBody.class) || handler.method.isAnnotationPresent(ResponseBody.class)){
+            resp.setContentType("application/json; charset=utf-8");
+            Class cls = result.getClass();
+            if (cls == String.class || cls == Integer.class || cls == Long.class || cls == int.class || cls == long.class){
+                resp.getWriter().print(result);
+            }else {
+                resp.getWriter().print(JSON.toJSONString(result));
             }
+            MyModeAndView modeAndView = new MyModeAndView();
+            modeAndView.setFlag(false);
+            return modeAndView;
+        }else {
+            return new MyModeAndView("/" + result.toString());
         }
-        return null;
     }
 
     private String parseParamValue(String[] params){
@@ -90,6 +77,9 @@ public class DefaultHandlerAdapter implements IHandlerAdapter {
         }
         if (clazz == String.class){
             return String.valueOf(value);
+        }
+        if (clazz == Long.class){
+            return Long.valueOf(value);
         }
         return value;
     }
