@@ -1,5 +1,6 @@
 package org.springframework.core;
 
+import org.springframework.annotation.RequestMethod;
 import org.springframework.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +20,14 @@ public class Handler {
     public Object controller;
     public Method method;
     public Pattern pattern;
+    public RequestMethod requestMethod;
     public Map<String, Integer> paramIndexmapping;
 
-    public Handler(Pattern pattern, Object controller, Method method) {
+    public Handler(Pattern pattern, Object controller, Method method, RequestMethod requestMethod) {
         this.pattern = pattern;
         this.controller = controller;
         this.method = method;
+        this.requestMethod = requestMethod;
         paramIndexmapping = new HashMap<>();
         putParamIndexMapping(method);
 

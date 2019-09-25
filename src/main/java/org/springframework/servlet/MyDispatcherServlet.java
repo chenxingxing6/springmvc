@@ -98,7 +98,7 @@ public class MyDispatcherServlet extends FrameworkServlet{
                 String regex = ("/" + baseUrl + requestMapping.value()).replaceAll("/+", "/");
                 Pattern pattern = Pattern.compile(regex);
                 // url正则表达式匹配，Controller，Method
-                handlerMapping.add(new Handler(pattern, entry.getValue(), method));
+                handlerMapping.add(new Handler(pattern, entry.getValue(), method, requestMapping.method()));
                 System.out.println("------   Mapping: " + regex + ", method:" + method);
             }
         }
@@ -166,6 +166,17 @@ public class MyDispatcherServlet extends FrameworkServlet{
             return ;
         }
         if(applicationContext.getHandlerAdapterMap().isEmpty()){
+            return;
+        }
+
+        // 对请求的方式进行校验
+        String requestMethod = req.getMethod();
+        if (handler.requestMethod.name().isEmpty() && requestMethod.equals(RequestMethod.GET.name())){
+            handler.requestMethod = RequestMethod.GET;
+        }else if (requestMethod.equals(handler.requestMethod.name())){
+            // 方法匹配上 nothing
+        }else {
+            resp.getWriter().write("500 ERROR!  请求方式不对");
             return;
         }
 

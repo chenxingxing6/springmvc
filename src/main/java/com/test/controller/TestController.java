@@ -33,7 +33,7 @@ public class TestController {
         return "/login";
     }
 
-    @RequestMapping("/get.json")
+    @RequestMapping(value = "/get.json", method = RequestMethod.GET)
     @ResponseBody
     public String test(@RequestParam("name") String name){
         return testService.test(name);
@@ -56,6 +56,12 @@ public class TestController {
         return user;
     }
 
+    @RequestMapping("/add")
+    @ResponseBody
+    public int test(HttpServletResponse resp, @RequestParam("a") Integer a, @RequestParam("b") Integer b){
+        return a + b;
+    }
+
     class User{
         private String name;
         private Integer age;
@@ -75,11 +81,5 @@ public class TestController {
         public void setAge(Integer age) {
             this.age = age;
         }
-    }
-
-    @RequestMapping("/add")
-    @ResponseBody
-    public int test(HttpServletResponse resp, @RequestParam("a") Integer a, @RequestParam("b") Integer b){
-        return a + b;
     }
 }

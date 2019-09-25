@@ -21,6 +21,7 @@ public class DefaultHandlerAdapter implements IHandlerAdapter {
         // 获取方法参数列表
         Class<?>[] parameterTypes = handler.method.getParameterTypes();
         Object[] paramValues = new Object[parameterTypes.length];
+        // 获取参数，Get和Post都可以用
         Map<String, String[]> paramsMap = req.getParameterMap();
 
         // 参数列表
