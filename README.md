@@ -460,3 +460,4 @@ public class MyDispatcherServlet extends HttpServlet{
     }
 ```
 ---
+![avatar](https://raw.githubusercontent.com/chenxingxing6/springmvc/master/img/99.jpg)
