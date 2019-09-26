@@ -173,7 +173,7 @@ public class MyDispatcherServlet extends FrameworkServlet{
         String requestMethod = req.getMethod();
         if (handler.requestMethod.name().isEmpty() && requestMethod.equals(RequestMethod.GET.name())){
             handler.requestMethod = RequestMethod.GET;
-        }else if (requestMethod.equals(handler.requestMethod.name())){
+        }else if (requestMethod.equalsIgnoreCase(handler.requestMethod.name())){
             // 方法匹配上 nothing
         }else {
             resp.getWriter().write("500 ERROR!  请求方式不对");

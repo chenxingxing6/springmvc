@@ -1,7 +1,8 @@
 ## 手写SpringMvc[尽可能模仿SpringMvc源码]
 
 ###### 更新日志 2019.9.25
-> 1.支持多种请求 Get、Post...
+> 1.支持多种请求 Get、Post...    
+> @RequestMapping(value = "/login", method = RequestMethod.POST)
 
 ###### 更新日志 2019.9.21 
  > 1. 修改前端控制器，模仿spirngmvc源码   
@@ -42,6 +43,11 @@ public void initStrategies(ApplicationContext context){
 
 项目结构
 ![avatar](https://raw.githubusercontent.com/chenxingxing6/springmvc/master/img/33.jpg)
+
+
+项目启动（jetty插件）
+![avatar](https://raw.githubusercontent.com/chenxingxing6/springmvc/master/img/88.jpg)
+
 
 ---
 ##### 登陆测试Demo
@@ -394,3 +400,63 @@ public class MyDispatcherServlet extends HttpServlet{
     }
 }
 ```
+
+---
+### Get,Post请求
+```html
+<html>
+<head>
+    <title>登陆</title>
+</head>
+<body>
+<div>
+    <h1>Get方式-欢迎登陆</h1>
+    <form action="/test/login" method="get">
+   <div>
+       <label>用户名：</label>
+       <input name="name" type="text"/>
+   </div>
+    <div>
+        <label>用户名：</label>
+        <input name="pwd" type="password"/>
+    </div>
+    <div>
+        <label></label>
+        <input type="submit" value="提交"/>
+    </div>
+    </form>
+</div>
+<hr>
+<div>
+    <h1>Post方式-欢迎登陆</h1>
+    <form action="/test/login" method="post">
+        <div>
+            <label>用户名：</label>
+            <input name="name" type="text"/>
+        </div>
+        <div>
+            <label>用户名：</label>
+            <input name="pwd" type="password"/>
+        </div>
+        <div>
+            <label></label>
+            <input type="submit" value="提交"/>
+        </div>
+    </form>
+</div>
+</body>
+</html>
+```
+
+---
+
+```html
+ @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public MyModeAndView login(@RequestParam("name") String name, @RequestParam("pwd") String pwd){
+        MyModeAndView modeAndView = new MyModeAndView();
+        modeAndView.setViewName("index");
+        modeAndView.addObject("name", name);
+        return modeAndView;
+    }
+```
+---

@@ -39,7 +39,7 @@ public class TestController {
         return testService.test(name);
     }
 
-    @RequestMapping("/login")
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public MyModeAndView login(@RequestParam("name") String name, @RequestParam("pwd") String pwd){
         MyModeAndView modeAndView = new MyModeAndView();
         modeAndView.setViewName("index");
